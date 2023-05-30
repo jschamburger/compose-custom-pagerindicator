@@ -3,9 +3,9 @@
 This repository contains code for building a custom PagerIndicator for Jetpack Compose using the Accompanist Pager library 0.30.
 
 # Showcase
- <td align="center">
-      <img src="https://github.com/ahmadmit2020/ComposeCustomPagerindicator/blob/master/showcase/az_recorder3.gif" width="360px">
-   </td>
+
+https://github.com/ahmadmit2020/ComposeCustomPagerindicator/assets/61660033/8b9411e5-48ee-4184-9564-05baea5e20c2
+
    
    `#android`,`#jetpack`,`#compose`,`#loading`,`#progressbar`
    
