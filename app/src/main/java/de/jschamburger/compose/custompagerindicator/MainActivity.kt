@@ -12,12 +12,15 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -58,15 +61,18 @@ fun Pager() {
         HorizontalPager(
             pageCount = 9,
             state = pagerState,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(24.dp).align(Alignment.Center),
         ) { page ->
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxWidth().height(500.dp)) {
                 Surface(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     AsyncImage(
                         model = pages[page].url,
-                        contentDescription = null
+                        contentScale = ContentScale.FillBounds,
+                        contentDescription = null,
+                        modifier = Modifier.padding(8.dp).background(   shape = RoundedCornerShape(16.dp) , color = Color.White),
+
                     )
                 }
             }
@@ -77,7 +83,7 @@ fun Pager() {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(end = 16.dp, bottom = 16.dp)
+                .padding(end = 16.dp, bottom = 36.dp)
         ) {
             Column {
 
