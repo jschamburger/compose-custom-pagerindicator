@@ -4,7 +4,7 @@ This repository contains code for building a custom PagerIndicator for Jetpack C
 
 # Showcase
  <td align="center">
-      <img src="https://github.com/ahmadmit2020/ComposeCustomPagerindicator/blob/master/showcase/az_recorder.mp4" width="360px">
+      <img src="https://github.com/ahmadmit2020/ComposeCustomPagerindicator/showcase/az_recorder.mp4" width="360px">
    </td>
    
    `#android`,`#jetpack`,`#compose`,`#loading`,`#progressbar`
