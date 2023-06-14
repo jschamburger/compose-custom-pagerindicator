@@ -5,9 +5,13 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -16,9 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.google.accompanist.pager.*
+import com.google.accompanist.pager.ExperimentalPagerApi
 import de.jschamburger.compose.custompagerindicator.ui.theme.MyApplicationTheme
 import kotlin.math.abs
 
@@ -36,11 +41,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn( ExperimentalFoundationApi::class)
 @Composable
 fun Pager() {
-    val pagerState = rememberPagerState()
-
+    val pagerState =rememberPagerState()
     val pages = listOf(
         Page("https://cdn.pixabay.com/photo/2014/02/19/20/39/winter-270160_1280.jpg"),
         Page("https://cdn.pixabay.com/photo/2019/11/23/03/08/valley-4646114_1280.jpg"),
@@ -55,178 +59,81 @@ fun Pager() {
 
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
-            count = pages.size,
+            pageCount = 9,
             state = pagerState,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.LightGray)
+            modifier = Modifier.fillMaxWidth().padding(24.dp).align(Alignment.Center),
         ) { page ->
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxWidth().height(500.dp)) {
                 Surface(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     AsyncImage(
                         model = pages[page].url,
-                        contentDescription = null
+                        contentScale = ContentScale.FillBounds,
+                        contentDescription = null,
+                        modifier = Modifier.padding(8.dp).background(   shape = RoundedCornerShape(16.dp) , color = Color.White),
+
                     )
                 }
             }
         }
+
+
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(end = 16.dp, bottom = 16.dp)
+                .padding(end = 16.dp, bottom = 36.dp)
         ) {
             Column {
-                HorizontalPagerIndicator(
+
+                CustomPagerIndicatorSolutionUpdate(
                     pagerState = pagerState,
-                    activeColor = Color.Blue,
-                    inactiveColor = Color.Gray,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    pageCount = 9
                 )
                 Spacer(Modifier.height(8.dp))
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    activeColor = Color.Red,
-                    inactiveColor = Color.White,
-                    indicatorShape = RoundedCornerShape(size = 2.dp),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(Modifier.height(8.dp))
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    activeColor = Color.Yellow,
-                    inactiveColor = Color.DarkGray,
-                    indicatorShape = RectangleShape,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(Modifier.height(8.dp))
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    activeColor = Color.Black,
-                    inactiveColor = Color(0xFF00BB00),
-                    indicatorShape = CutCornerShape(size = 4.dp),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(Modifier.height(8.dp))
-                CustomPagerIndicatorFirstTry(
-                    pagerState = pagerState,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(Modifier.height(8.dp))
-                CustomPagerIndicatorSecondTry(
-                    pagerState = pagerState,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(Modifier.height(8.dp))
-                CustomPagerIndicatorSolution(
-                    pagerState = pagerState,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
             }
         }
     }
 }
 
-private const val MULTIPLIER_SELECTED_PAGE = 4
-private val baseWidth = 4.dp
+
+private const val MULTIPLIER_SELECTED_PAGE = 3
+private val baseWidth = 9.dp
 private val spacing = 10.dp
 private val height = 8.dp
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn( ExperimentalFoundationApi::class)
 @Composable
-fun CustomPagerIndicatorFirstTry(pagerState: PagerState, modifier: Modifier = Modifier, indicatorColor: Color = Color.Black) {
+fun CustomPagerIndicatorSolutionUpdate(pagerState: PagerState, modifier: Modifier = Modifier, indicatorColor: Color = MaterialTheme.colors.primary , pageCount:Int = 3) {
     Row {
-        val currentPageWidth = baseWidth * (1 + (1 - abs(pagerState.currentPageOffset)) * MULTIPLIER_SELECTED_PAGE)
-        val targetPageWidth = baseWidth * (1 + abs(pagerState.currentPageOffset) * MULTIPLIER_SELECTED_PAGE)
-
-        Log.d(
-            "Indicator First Try",
-            "currentPage: ${pagerState.currentPage} targetPage ${pagerState.targetPage} offset ${pagerState.currentPageOffset} currentPageWidth: $currentPageWidth targetPageWidth: $targetPageWidth"
-        )
-
-        repeat(pagerState.pageCount) { index ->
-            val width = when (index) {
-                pagerState.currentPage -> currentPageWidth
-                pagerState.targetPage -> targetPageWidth
-                else -> baseWidth
-            }
-            Box(
-                modifier = Modifier
-                    .width(width)
-                    .background(indicatorColor)
-                    .height(height)
-            )
-            if (index != pagerState.pageCount - 1) {
-                Spacer(modifier = Modifier.width(spacing))
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun CustomPagerIndicatorSecondTry(pagerState: PagerState, modifier: Modifier = Modifier, indicatorColor: Color = Color.Black) {
-    Row {
-        val currentPage = pagerState.currentPage
-        val targetPage = if (pagerState.currentPageOffset < 0) currentPage - 1 else currentPage + 1
-        val currentPageWidth = baseWidth * (1 + (1 - abs(pagerState.currentPageOffset)) * MULTIPLIER_SELECTED_PAGE)
-        val targetPageWidth = baseWidth * (1 + abs(pagerState.currentPageOffset) * MULTIPLIER_SELECTED_PAGE)
-
-        Log.d(
-            "Indicator Second Try",
-            "currentPage: $currentPage targetPage $targetPage offset ${pagerState.currentPageOffset} currentPageWidth: $currentPageWidth targetPageWidth: $targetPageWidth"
-        )
-
-        repeat(pagerState.pageCount) { index ->
-            val width = when (index) {
-                currentPage -> currentPageWidth
-                targetPage -> targetPageWidth
-                else -> baseWidth
-            }
-            Box(
-                modifier = Modifier
-                    .width(width)
-                    .background(indicatorColor)
-                    .height(height)
-            )
-            if (index != pagerState.pageCount - 1) {
-                Spacer(modifier = Modifier.width(spacing))
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun CustomPagerIndicatorSolution(pagerState: PagerState, modifier: Modifier = Modifier, indicatorColor: Color = Color.Black) {
-    Row {
-        val offsetIntPart = pagerState.currentPageOffset.toInt()
-        val offsetFractionalPart = pagerState.currentPageOffset - offsetIntPart
+        val offsetIntPart = pagerState.currentPageOffsetFraction.toInt()
+        val offsetFractionalPart = pagerState.currentPageOffsetFraction - offsetIntPart
         val currentPage = pagerState.currentPage + offsetIntPart
-        val targetPage = if (pagerState.currentPageOffset < 0) currentPage - 1 else currentPage + 1
+        val targetPage = if (pagerState.currentPage < 0) currentPage - 1 else currentPage + 1
         val currentPageWidth = baseWidth * (1 + (1 - abs(offsetFractionalPart)) * MULTIPLIER_SELECTED_PAGE)
         val targetPageWidth = baseWidth * (1 + abs(offsetFractionalPart) * MULTIPLIER_SELECTED_PAGE)
 
         Log.d(
             "Indicator Solution",
-            "currentPage: $currentPage targetPage $targetPage offset ${pagerState.currentPageOffset} offsetIntPart $offsetIntPart offsetFractionalPart $offsetFractionalPart currentPageWidth: $currentPageWidth targetPageWidth: $targetPageWidth"
+            "currentPage: $currentPage targetPage $targetPage offset ${pagerState.currentPageOffsetFraction} offsetIntPart $offsetIntPart offsetFractionalPart $offsetFractionalPart currentPageWidth: $currentPageWidth targetPageWidth: $targetPageWidth"
         )
 
-        repeat(pagerState.pageCount) { index ->
+        repeat(pageCount) { index ->
             val width = when (index) {
                 currentPage -> currentPageWidth
-                targetPage -> targetPageWidth
+//                targetPage -> targetPageWidth
                 else -> baseWidth
             }
             Box(
                 modifier = Modifier
                     .width(animateDpAsState(targetValue = width).value)
                     .width(width)
-                    .background(indicatorColor)
+                    .background(indicatorColor, CircleShape)
                     .height(height)
             )
-            if (index != pagerState.pageCount - 1) {
+            if (index != pageCount - 1) {
                 Spacer(modifier = Modifier.width(spacing))
             }
         }
