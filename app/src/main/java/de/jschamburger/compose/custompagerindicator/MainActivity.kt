@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package de.jschamburger.compose.custompagerindicator
 
 import android.os.Bundle
@@ -5,8 +7,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -18,7 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.google.accompanist.pager.*
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPagerIndicator
 import de.jschamburger.compose.custompagerindicator.ui.theme.MyApplicationTheme
 import kotlin.math.abs
 
@@ -36,10 +43,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Pager() {
-    val pagerState = rememberPagerState()
 
     val pages = listOf(
         Page("https://cdn.pixabay.com/photo/2014/02/19/20/39/winter-270160_1280.jpg"),
@@ -53,9 +59,10 @@ fun Pager() {
         Page("https://cdn.pixabay.com/photo/2019/10/09/20/18/etretat-4538160_1280.jpg"),
     )
 
+    val pagerState = rememberPagerState { pages.size }
+
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
-            count = pages.size,
             state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
@@ -80,6 +87,7 @@ fun Pager() {
             Column {
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
+                    pageCount = pages.size,
                     activeColor = Color.Blue,
                     inactiveColor = Color.Gray,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -87,6 +95,7 @@ fun Pager() {
                 Spacer(Modifier.height(8.dp))
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
+                    pageCount = pages.size,
                     activeColor = Color.Red,
                     inactiveColor = Color.White,
                     indicatorShape = RoundedCornerShape(size = 2.dp),
@@ -95,6 +104,7 @@ fun Pager() {
                 Spacer(Modifier.height(8.dp))
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
+                    pageCount = pages.size,
                     activeColor = Color.Yellow,
                     inactiveColor = Color.DarkGray,
                     indicatorShape = RectangleShape,
@@ -103,6 +113,7 @@ fun Pager() {
                 Spacer(Modifier.height(8.dp))
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
+                    pageCount = pages.size,
                     activeColor = Color.Black,
                     inactiveColor = Color(0xFF00BB00),
                     indicatorShape = CutCornerShape(size = 4.dp),
@@ -110,32 +121,32 @@ fun Pager() {
                 )
                 Spacer(Modifier.height(8.dp))
                 CustomPagerIndicatorFirstTry(
-                    pagerState = pagerState,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    pagerState = pagerState
                 )
                 Spacer(Modifier.height(8.dp))
                 CustomPagerIndicatorSecondTry(
-                    pagerState = pagerState,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    pagerState = pagerState
                 )
                 Spacer(Modifier.height(8.dp))
                 CustomPagerIndicatorSolution(
-                    pagerState = pagerState,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    pagerState = pagerState
                 )
             }
         }
     }
 }
 
+private val PagerState.currentPageOffset: Float
+    get() {
+        return (currentPage - targetPage) + currentPageOffsetFraction
+    }
 private const val MULTIPLIER_SELECTED_PAGE = 4
 private val baseWidth = 4.dp
 private val spacing = 10.dp
 private val height = 8.dp
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun CustomPagerIndicatorFirstTry(pagerState: PagerState, modifier: Modifier = Modifier, indicatorColor: Color = Color.Black) {
+fun CustomPagerIndicatorFirstTry(pagerState: PagerState, indicatorColor: Color = Color.Black) {
     Row {
         val currentPageWidth = baseWidth * (1 + (1 - abs(pagerState.currentPageOffset)) * MULTIPLIER_SELECTED_PAGE)
         val targetPageWidth = baseWidth * (1 + abs(pagerState.currentPageOffset) * MULTIPLIER_SELECTED_PAGE)
@@ -164,9 +175,8 @@ fun CustomPagerIndicatorFirstTry(pagerState: PagerState, modifier: Modifier = Mo
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun CustomPagerIndicatorSecondTry(pagerState: PagerState, modifier: Modifier = Modifier, indicatorColor: Color = Color.Black) {
+fun CustomPagerIndicatorSecondTry(pagerState: PagerState, indicatorColor: Color = Color.Black) {
     Row {
         val currentPage = pagerState.currentPage
         val targetPage = if (pagerState.currentPageOffset < 0) currentPage - 1 else currentPage + 1
@@ -197,9 +207,8 @@ fun CustomPagerIndicatorSecondTry(pagerState: PagerState, modifier: Modifier = M
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun CustomPagerIndicatorSolution(pagerState: PagerState, modifier: Modifier = Modifier, indicatorColor: Color = Color.Black) {
+fun CustomPagerIndicatorSolution(pagerState: PagerState, indicatorColor: Color = Color.Black) {
     Row {
         val offsetIntPart = pagerState.currentPageOffset.toInt()
         val offsetFractionalPart = pagerState.currentPageOffset - offsetIntPart
@@ -208,6 +217,10 @@ fun CustomPagerIndicatorSolution(pagerState: PagerState, modifier: Modifier = Mo
         val currentPageWidth = baseWidth * (1 + (1 - abs(offsetFractionalPart)) * MULTIPLIER_SELECTED_PAGE)
         val targetPageWidth = baseWidth * (1 + abs(offsetFractionalPart) * MULTIPLIER_SELECTED_PAGE)
 
+        Log.d(
+            "Indicator Solution",
+            "PAGER currentPage: ${pagerState.currentPage} targetPage ${pagerState.targetPage} offset ${pagerState.currentPageOffset}"
+        )
         Log.d(
             "Indicator Solution",
             "currentPage: $currentPage targetPage $targetPage offset ${pagerState.currentPageOffset} offsetIntPart $offsetIntPart offsetFractionalPart $offsetFractionalPart currentPageWidth: $currentPageWidth targetPageWidth: $targetPageWidth"
